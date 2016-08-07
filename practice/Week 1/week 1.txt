@@ -57,6 +57,9 @@ c.next() returns next object in movies collection
 c.hasNext() returns boolean 
 
 
+
+
+
 Node JS 
 
 express JS - layer on http, routing and includes details of http
@@ -75,6 +78,49 @@ server.listen(8000);
 console.log("server has started");
 
 
+
+
+
+Node.js driver - interacts with mongod server using BSON. In this case, the node js driver is a javascript program responsible for opening sockets etc.
+
+
+reads the documents title in movies collection
+var MongoClient = require('mongodb').MongoClient,
+	assert = require('assert');
+
+MongoClient.connect('mongodb://localhost:27017/video', function(err, db){
+	assert.equal(null, err);
+	console.log("successful connected to server");
+
+	db.collection('movies').find({}).toArray(function(err, docs){
+		docs.forEach(function(doc){
+			console.log(doc.title);
+		});
+		db.close();
+	});
+});
+
+
+
+Express JS
+
+var express = require('express'),
+	app = express();
+
+app.get('/', function(req, res){
+	res.send('hello world');
+})
+
+app.use(function(req, res){
+	res.sendStatus(404);
+})
+
+var server = app.listen(3000, function(){
+	var port = server.address().port;
+	console.log('express server listening on port %s', port);
+})
+
+app.use - this is the default route.
 
 
 
