@@ -8,3 +8,59 @@ db.names.insert({'name':'rahul'}) for inserting records in 'name' collection.
 db.names.find() lists all the records in 'names' collection.
 
 
+BSON - Binary JSON
+Mongodb data is stored as BSON - same in application
+BSON advantages: Lightweight, traverable, efficient
+
+JSON doesnt support dates and couldnt differentiate integers or floating point numbers.
+BSON eliminates these advantages. (bsonspec.org check more)
+BSON adds a unique ID by default like objectId in the query below for insertOne.
+
+CRUD operations:
+use video (create namespace)
+use video.movies (movies collection)
+
+> db.movies.insertOne({"title":"suicide squad", "year":2016})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("57a6b2013dc327b12d07e641")
+}
+
+> db.movies.insertOne({"title":"jason bourne", "year":2016})      
+{                                                                 
+        "acknowledged" : true,                                    
+        "insertedId" : ObjectId("57a6b2cf3dc327b12d07e642")       
+}                                                                 
+> db.movies.insertOne({"title":"star trek beyond", "year":2016})  
+{                                                                 
+        "acknowledged" : true,                                    
+        "insertedId" : ObjectId("57a6b2e63dc327b12d07e643")       
+}                                                                 
+
+
+db.movies.find().pretty()
+
+
+> db.movies.find({"title":"jason bourne"}).pretty()
+{
+        "_id" : ObjectId("57a6b2cf3dc327b12d07e642"),
+        "title" : "jason bourne",
+        "year" : 2016
+}
+
+var c = db.movies.find()
+
+c.next()
+
+c.next() returns next object in movies collection
+
+c.hasNext() returns boolean 
+
+
+
+
+
+
+
+
+
