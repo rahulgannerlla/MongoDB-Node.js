@@ -1,0 +1,10 @@
+MongoDB scaling out
+Relational database increase in cost for increase in data in single server and expensive for joining multiple tables. 
+
+clients make requests to app. app requests mongodb for operations. mongodb requests using mongo shell
+mongo is shell. mongod is server.
+
+db.names.insert({'name':'rahul'}) for inserting records in 'name' collection.
+db.names.find() lists all the records in 'names' collection.
+
+
