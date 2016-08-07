@@ -126,5 +126,210 @@ app.use - this is the default route.
 
 
 
+Templates
+problem using express is sending a static response html to port 3000.
+to avoid this use template library. (views for consolidate library)
+<h1> hello {{name}} </h1>
+
+
+var express = require('express'),
+	app = express(),
+	engines = require('consolidate');
+
+app.engine('html', engines.nunjucks);
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
+
+app.get('/', function(req, res) {
+	res.render('hello', { name:'templates'});
+});
+
+app.use(function(req, res){
+	res.sendStatus(404);
+});
+
+var server = app.listen(3000, function(){
+	var port = server.address().port;
+	console.log('express server listening on port %s', port);
+});
+
+
+
+
+
+
+
+All together now
+
+var express = require('express'),
+    app = express(),
+    engines = require('consolidate'),
+    MongoClient = require('mongodb').MongoClient,
+    assert = require('assert');
+
+app.engine('html', engines.nunjucks);
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
+
+MongoClient.connect('mongodb://localhost:27017/video', function(err, db) {
+
+    assert.equal(null, err);
+    console.log("Successfully connected to MongoDB.");
+
+    app.get('/', function(req, res){
+
+        db.collection('movies').find({}).toArray(function(err, docs) {
+            res.render('movies', { 'movies': docs } );
+        });
+
+    });
+
+    app.use(function(req, res){
+        res.sendStatus(404);
+    });
+    
+    var server = app.listen(3000, function() {
+        var port = server.address().port;
+        console.log('Express server listening on port %s.', port);
+    });
+
+});
+
+
+views/movies.html
+
+<head>
+<style>
+body { font-family: 'Helvetica', 'Arial', sans-serif; }
+</style>
+</head>
+
+<h1>Movies</h1>
+{% for movie in movies %}
+  <li><a href="http://www.imdb.com/title/{{ movie.imdb }}">{{ movie.title }}, {{ movie.year }}</a></li>
+{% else %}
+  <li>No movies found.</li>
+{% endfor %}
+
+
+
+
+In package.json - ~ in dependencies version means for example for 4.13.3 will not install 4.13.2 and also does not install 4.14
+
+
+
+more of express GET
+URL parameters
+localhost:3000/name?getvar1=value1&getvar2=value2
+
+var express = require('express'),
+    app = express(),
+    engines = require('consolidate');
+
+app.engine('html', engines.nunjucks);
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
+
+// Handler for internal server errors
+function errorHandler(err, req, res, next) {
+    console.error(err.message);
+    console.error(err.stack);
+    res.status(500).render('error_template', { error: err });
+}
+
+app.get('/:name', function(req, res, next) {
+    var name = req.params.name;
+    var getvar1 = req.query.getvar1;
+    var getvar2 = req.query.getvar2;
+    res.render('hello', { name : name, getvar1 : getvar1, getvar2 : getvar2 });
+});
+
+app.use(errorHandler);
+
+var server = app.listen(3000, function() {
+    var port = server.address().port;
+    console.log('Express server listening on port %s.', port);
+});
+
+
+views:
+{{getvar1}} -- {{getvar2}}
+
+
+
+Express post
+uses bodyparser and error handler
+next call back is a function send by express. used for error handling.
+var express = require('express'),
+    app = express(),
+    engines = require('consolidate'),
+    bodyParser = require('body-parser');
+
+app.engine('html', engines.nunjucks);
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
+app.use(bodyParser.urlencoded({ extended: true })); 
+
+// Handler for internal server errors
+function errorHandler(err, req, res, next) {
+    console.error(err.message);
+    console.error(err.stack);
+    res.status(500).render('error_template', { error: err });
+}
+
+app.use(errorhandler)
+
+app.get('/', function(req, res, next) {
+    res.render('fruitPicker', { 'fruits' : [ 'apple', 'orange', 'banana', 'peach' ] });
+});
+
+app.post('/favorite_fruit', function(req, res, next) {
+    var favorite = req.body.fruit;
+    if (typeof favorite == 'undefined') {
+        next('Please choose a fruit!');
+    }
+    else {
+        res.send("Your favorite fruit is " + favorite);
+    }
+});
+
+app.use(errorHandler);
+
+var server = app.listen(3000, function() {
+    var port = server.address().port;
+    console.log('Express server listening on port %s.', port);
+});
+
+
+
+views
+
+<!doctype HTML>
+<html>
+  <head><title>Fruit Picker</title></head>
+  <body>
+     <form action="/favorite_fruit" method="POST">
+        <p>What is your favorite fruit?</p>
+        {% for fruit in fruits %}
+          <p>
+            <input type="radio" name="fruit" value="{{fruit}}"/>{{fruit}}
+          </p>
+        {% endfor %}
+        <input type="submit" value="Submit"/>
+     </form>
+  </body>
+</html>
+
+error view
+<h1>Error: {{error}}</h1>
+
+
+
+
+
+
+
+
+
 
 
