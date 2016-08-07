@@ -57,6 +57,24 @@ c.next() returns next object in movies collection
 c.hasNext() returns boolean 
 
 
+Node JS 
+
+express JS - layer on http, routing and includes details of http
+
+ console.log ("hello world");
+
+ var http = require('http');
+
+ var server = http.createServer(function(request, response){
+ 	response.writeHead(200, {"Content-Type":"text/plain"})
+	response.end("Hello, world\n");
+	})
+
+server.listen(8000);
+
+console.log("server has started");
+
+
 
 
 
