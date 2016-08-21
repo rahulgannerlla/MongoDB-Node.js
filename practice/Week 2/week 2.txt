@@ -94,6 +94,22 @@ db.movieDetails.find( { "awards.text" : {$regex: /^Won.*/} } )
 Array operators
 $all - matches arrays that contain all elements
 db.movieDetails.find( { genres: { $all: ["comedy", "crime", "drama"] } }).pretty()
+
 $size - returns fields with length of array
 db.movieDetails.find ( { countries: { $size:1 } } ).pretty()
-$elemMatch - all criteria being satisfied in single field 
+
+$elemMatch - all criteria being satisfied in single field
+
+
+
+Update 
+update one - db.movieDetails.updateOne( { title:"Martian" }, { $set: {poster: ""} } )
+$set, $unset, $min, $max, $currentDate, $unset, $push, $push - $each, $slice
+
+update many - updates several records in a collection
+db.movieDetails.updateMany( { rated:null }, {  $set: { rated: "UNRATED" } } )
+
+upserts - no document found then insert new document
+replace all
+
+ 
