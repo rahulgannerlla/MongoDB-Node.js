@@ -110,6 +110,6 @@ update many - updates several records in a collection
 db.movieDetails.updateMany( { rated:null }, {  $set: { rated: "UNRATED" } } )
 
 upserts - no document found then insert new document
-replace all
-
+replace one - replace one document. 
+db.movies.replaceOne( { "x": y }, new_y  )
  
