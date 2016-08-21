@@ -10,7 +10,6 @@ db.moviesScratch.find().pretty() returns two duplicate documents with different 
 
 db.moviesScratch.insertMany ( {}, {}, {}  )
 
-
 To deal problems with insertMany you can use ordered or unordered inserts.  
 
 ordered inserts - the execution of the inserts stops if there is an error.
@@ -18,5 +17,48 @@ Unordered inserts - The execution of inserts does not stop if there is an error.
 
 db.moviesScratch.insertMany ( [{}. {}. {} ], {"ordered": false}  )
 
-Update commands can be used for documen creation. upserts are used. 
+Update commands can be used for documen creation (upserts)
+
+_id : first 4 bytes  seconds (dates) , 3 bytes mac address, 2 bytes process ID, 3 bytes counter (used for distinction)
+
+
+
+
+
+Reading documents
+db.movieDetails.find({ rated :"PG-13"}).count()
+db.movieDetails.find({ rated :"PG-13", year: 2009}).count()
+db.movieDetails.find({ "tomato.meter":100 }).count() ---- dot notation --- key enclosed in quotes
+db.movieDetails.find({ "tomato.meter":100 }).find().pretty()
+
+Equality matches on arrays
+1) on the entire array 
+db.movieDetails.find({ "writers" :  ["Ethan", "Joel"] }).count() ---- order matters Joel followed by Ethan
+2) based on any element
+db.movieDetails.find({ "actors": "Jeff Bridges" }).pretty() 
+3) based on specific element
+db.movieDetails.find({ "actors.0": "Jeff Bridges" }).pretty() --- index of array dot notation
+4) more complex matches using operators
+
+Equality matches
+1) Scalars
+2) Embedded documents
+3) Arrays
+
+cursors: find returns a cursor.  You can initialize the output to cursor using variable.  
+
+var c = db.movieDetails.find()
+var doc = function () { return c.hasNext() ? c.next() : null }
+c.objsLeftInBatch()
+doc()
+doc()
+....
+
+
+Projection: limit data to applications. reduced overhead
+db.movieDetails.find( { rated: "PG" }, {title: 1, _id: 0} ).pretty()
+
+
+
+
 
