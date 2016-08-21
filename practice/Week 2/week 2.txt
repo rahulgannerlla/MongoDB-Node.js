@@ -1,0 +1,22 @@
+creating documents
+
+db.moviesScratch.insertOne{{"title":"rocky"}}
+_id is unique identifier
+You can use _id by self instead specified by MongoDB.
+
+db.moviesScratch.insertOne{{"title":"rocky", "_id":"xxxxxx"}}
+
+db.moviesScratch.find().pretty() returns two duplicate documents with different ID's
+
+db.moviesScratch.insertMany ( {}, {}, {}  )
+
+
+To deal problems with insertMany you can use ordered or unordered inserts.  
+
+ordered inserts - the execution of the inserts stops if there is an error.
+Unordered inserts - The execution of inserts does not stop if there is an error.
+
+db.moviesScratch.insertMany ( [{}. {}. {} ], {"ordered": false}  )
+
+Update commands can be used for documen creation. upserts are used. 
+
