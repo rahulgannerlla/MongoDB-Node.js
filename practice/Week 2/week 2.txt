@@ -54,11 +54,46 @@ doc()
 doc()
 ....
 
-
 Projection: limit data to applications. reduced overhead
 db.movieDetails.find( { rated: "PG" }, {title: 1, _id: 0} ).pretty()
+only outputs title
+1 - output the category
+0 - dont output the category
 
 
 
 
 
+comparison operators
+db.movieDetails.find({ runtime: { $gte: 90, $lte: 20 } }).pretty()
+$gt $lt
+$ne - not equal to 
+$in-  db.movieDetails.find( { rated: { $in : ["G", "PG", "PG-13"] } } )
+
+
+
+
+Element operators
+$exists - db.movieDetails.find ( { "tomato.meter" : { $exists: false} })
+$type - data cleaning operator
+  db.movieDetails.find ( { "_id": { $type: $string }}).pretty()
+remove duplicates by checking the type
+
+
+
+Logical Operators
+$and $or $not $nor
+$or - db.movieDetails.find( { $or: [ { "tomato.meter": {$gt:95} }, {"metacric": { $gt: 88 }} ] }).pretty()
+$and - for using same category 
+
+
+Regex Operator
+db.movieDetails.find( { "awards.text" : {$regex: /^Won.*/} } )
+
+
+Array operators
+$all - matches arrays that contain all elements
+db.movieDetails.find( { genres: { $all: ["comedy", "crime", "drama"] } }).pretty()
+$size - returns fields with length of array
+db.movieDetails.find ( { countries: { $size:1 } } ).pretty()
+$elemMatch - all criteria being satisfied in single field 
