@@ -1,0 +1,98 @@
+mongoimport - human readable to json to documents
+mongo binds to 27017 by default port
+
+change it to 27018 - error 
+
+mongod --port 27018 is correct
+
+npm install
+
+connecting to db instance and fetching the records
+
+var MongoClient = require('mongodb').MongoClient,
+    assert = require('assert');
+
+
+MongoClient.connect('mongodb://localhost:27017/crunchbase', function(err, db) {
+
+    assert.equal(err, null);
+    console.log("Successfully connected to MongoDB.");
+
+    var query = {"category_code": "biotech"};
+
+    db.collection('companies').find(query).toArray(function(err, docs) {
+
+        assert.equal(err, null);
+        assert.notEqual(docs.length, 0);
+        
+        docs.forEach(function(doc) {
+            console.log( doc.name + " is a " + doc.category_code + " company." );
+        });
+        
+        db.close();
+        
+    });
+
+});
+
+
+using cursor
+var MongoClient = require('mongodb').MongoClient,
+    assert = require('assert');
+
+
+MongoClient.connect('mongodb://localhost:27017/crunchbase', function(err, db) {
+
+    assert.equal(err, null);
+    console.log("Successfully connected to MongoDB.");
+
+    var query = {"category_code": "biotech"};
+
+    var cursor = db.collection('companies').find(query);
+
+    cursor.forEach(
+        function(doc) {
+            console.log( doc.name + " is a " + doc.category_code + " company." );
+        },
+        function(err) {
+            assert.equal(err, null);
+            return db.close();
+        }
+    );
+
+});
+
+toArray - call waits until all the documents are fetched
+forEach (cursors) - batch size calls memory overhead reduced and execution time
+
+
+
+use of projection for filtering the columns from the resultset
+var MongoClient = require('mongodb').MongoClient,
+    assert = require('assert');
+
+MongoClient.connect('mongodb://localhost:27017/crunchbase', function(err, db) {
+
+    assert.equal(err, null);
+    console.log("Successfully connected to MongoDB.");
+
+    var query = {"category_code": "biotech"};
+    var projection = {"name": 1, "category_code": 1, "_id": 0};
+
+    var cursor = db.collection('companies').find(query);
+    cursor.project(projection);
+
+    cursor.forEach(
+        function(doc) {
+            console.log(doc.name + " is a " + doc.category_code + " company.");
+            console.log(doc);
+        },
+        function(err) {
+            assert.equal(err, null);
+            return db.close();
+        }
+    );
+
+});
+
+
