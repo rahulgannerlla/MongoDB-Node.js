@@ -394,6 +394,158 @@ function commandLineOptions() {
 
 
 
+insertone
+ twitterClient.stream('statuses/filter', {track: "marvel"}, function(stream) {
+        stream.on('data', function(status) {
+            console.log(status.text);
+            db.collection("statuses").insertOne(status, function(err, res) {
+                console.log("Inserted document with _id: " + res.insertedId + "\n");
+            });
+        });
+
+
+insertmany
+MongoClient.connect('mongodb://localhost:27017/social', function(err, db) {
+
+    assert.equal(null, err);
+    console.log("Successfully connected to MongoDB.");
+
+    var screenNames = ["Marvel", "DCComics", "TheRealStanLee"];
+    var done = 0;
+
+    screenNames.forEach(function(name) {
+
+        var cursor = db.collection("statuses").find({"user.screen_name": name});
+        cursor.sort({ "id": -1 });
+        cursor.limit(1);
+
+        cursor.toArray(function(err, docs) {
+            assert.equal(err, null);
+            
+            var params;
+            if (docs.length == 1) {
+                params = { "screen_name": name, "since_id": docs[0].id, "count": 10 };
+            } else {
+                params = { "screen_name": name, "count": 10 };
+            }
+            
+            client.get('statuses/user_timeline', params, function(err, statuses, response) {
+                
+                assert.equal(err, null);
+                
+                db.collection("statuses").insertMany(statuses, function(err, res) {
+
+                    console.log(res);
+                    
+                    done += 1;
+                    if (done == screenNames.length) {
+                        db.close();
+                    }
+                    
+                });
+            });
+        })
+    });
+});               
+
+
+
+
+
+
+delete one
+MongoClient.connect('mongodb://localhost:27017/crunchbase', function(err, db) {
+
+    assert.equal(err, null);
+    console.log("Successfully connected to MongoDB.");
+    
+    var query = {"permalink": {"$exists": true, "$ne": null}};
+    var projection = {"permalink": 1, "updated_at": 1};
+
+    var cursor = db.collection('companies').find(query);
+    cursor.project(projection);
+    cursor.sort({"permalink": 1})
+
+    var numToRemove = 0;
+
+    var previous = { "permalink": "", "updated_at": "" };
+    cursor.forEach(
+        function(doc) {
+
+            if ( (doc.permalink == previous.permalink) && (doc.updated_at == previous.updated_at) ) {
+                console.log(doc.permalink);
+
+                numToRemove = numToRemove + 1;
+
+                var filter = {"_id": doc._id};
+
+                db.collection('companies').deleteOne(filter, function(err, res) {
+
+                    assert.equal(err, null);
+                    console.log(res.result);
+
+                });
+
+            }
+            
+            previous = doc;
+            
+        },
+        function(err) {
+
+            assert.equal(err, null);
+
+        }
+    );
+
+});
+
+deletemany
+MongoClient.connect('mongodb://localhost:27017/crunchbase', function(err, db) {
+
+    assert.equal(err, null);
+    console.log("Successfully connected to MongoDB.");
+    
+    var query = {"permalink": {$exists: true, $ne: null}};
+    var projection = {"permalink": 1, "updated_at": 1};
+
+    var cursor = db.collection('companies').find(query);
+    cursor.project(projection);
+    cursor.sort({"permalink": 1})
+
+    var markedForRemoval = [];
+
+    var previous = { "permalink": "", "updated_at": "" };
+    cursor.forEach(
+        function(doc) {
+
+            if ( (doc.permalink == previous.permalink) && (doc.updated_at == previous.updated_at) ) {
+                markedForRemoval.push(doc._id);
+            }
+
+            previous = doc;
+        },
+        function(err) {
+
+            assert.equal(err, null);
+
+            var filter = {"_id": {"$in": markedForRemoval}};
+
+            db.collection("companies").deleteMany(filter, function(err, res) {
+
+                console.log(res.result);
+                console.log(markedForRemoval.length + " documents removed.");
+
+                return db.close();
+            });
+        }
+    );
+
+});
+
+
+
+
 
 
 
